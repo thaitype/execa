@@ -1,0 +1,45 @@
+name: Publish NPM
+
+on:
+  push:
+
+env:
+  node-version: 22
+  bun-version: 1.1.29
+
+  npm-bundle-scripts-dir: '.github/workflows/npm-bundle'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.bun-version }}
+
+      - name: "[Script] Install dependencies"
+        run: bun install
+        working-directory: ${{ env.npm-bundle-scripts-dir }}
+
+      - name: "[Script] start"
+        run: bun start
+        working-directory: ${{ env.npm-bundle-scripts-dir }}
+
+      ## Publish
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.node-version }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: thaitype__execa
+          retention-days: 1
+          path: |
+            .
+            !node_modules
+
+
+
